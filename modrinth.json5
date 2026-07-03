@@ -1,14 +1,18 @@
 {
-  "projectId": "YOUR_PROJECT_ID_OR_SLUG",
+  "projectId": "3actGxFb",
   "loaders": [
-    "paper", "folia"
+    "paper",
+    "spigot",
+    "bukkit",
+    "purpur"
   ],
   "gameVersions": [
-    "1.21.4",
-    "1.21.3",
-    "1.21.2",
+    "1.21",
     "1.21.1",
-    "1.21"
+    "1.21.2",
+    "1.21.3",
+    "1.21.4",
+    "1.21.8"
   ],
   "dependencies": [
     {
