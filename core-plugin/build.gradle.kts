@@ -30,6 +30,7 @@ tasks.processResources {
 
 dependencies {
     implementation(project(":core-api"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
     compileOnly("io.papermc.paper:paper-api:$paperApiVersion")
     compileOnly("org.yuemi:YueMiLibs-api:$yuemiLibsApiVersion")
 }
