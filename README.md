@@ -1,6 +1,6 @@
-# Minecraft Plugin Templates
+# MC-MMO-Mobs
 
-This is a repository templates For Minecraft Plugins using gradle.
+An Minecraft Plugin That Implement MMO Games Mechanics On Mobs 
 
 ---
 
