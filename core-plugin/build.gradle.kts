@@ -11,6 +11,7 @@ val apiVersion: String by project
 val authors: String by project
 val paperApiVersion: String by project
 val yuemiLibsApiVersion: String by project
+val mmoMechanicsApiVersion: String by project
 val pluginVersion: String = project.version.toString()
 
 tasks.processResources {
@@ -33,6 +34,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.1")
     compileOnly("io.papermc.paper:paper-api:$paperApiVersion")
     compileOnly("org.yuemi:YueMiLibs-api:$yuemiLibsApiVersion")
+    compileOnly("org.yuemi:MmoMechanics-api:$mmoMechanicsApiVersion")
 }
 
 tasks.withType<JavaCompile>().configureEach {
