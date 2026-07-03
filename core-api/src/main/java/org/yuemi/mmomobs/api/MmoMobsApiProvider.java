@@ -1,17 +1,17 @@
-package org.yuemi.example.api;
+package org.yuemi.mmomobs.api;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Entry point for accessing the ExamplePlugin API.
+ * Entry point for accessing the MmoMobsPlugin API.
  *
  * Consumers should depend on this interface, not implementation details.
  */
-public interface ExampleApiProvider {
+public interface MmoMobsApiProvider {
 
     /**
      * @return active API instance
      */
     @NotNull
-    ExampleApi getApi();
+    MmoMobsApi getApi();
 }

@@ -1,19 +1,19 @@
-package org.yuemi.example.plugin;
+package org.yuemi.mmomobs.plugin;
 
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.yuemi.example.api.ExampleApi;
+import org.yuemi.mmomobs.api.MmoMobsApi;
 
-public final class ExamplePlugin extends JavaPlugin {
+public final class MmoMobsPlugin extends JavaPlugin {
 
-    private ExampleApi api;
+    private MmoMobsApi api;
 
     @Override
     public void onEnable() {
-        this.api = new ExampleApiImpl();
+        this.api = new MmoMobsApiImpl();
 
         getServer().getServicesManager().register(
-                ExampleApi.class,
+                MmoMobsApi.class,
                 api,
                 this,
                 ServicePriority.Normal
@@ -22,6 +22,6 @@ public final class ExamplePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getServer().getServicesManager().unregister(ExampleApi.class, api);
+        getServer().getServicesManager().unregister(MmoMobsApi.class, api);
     }
 }

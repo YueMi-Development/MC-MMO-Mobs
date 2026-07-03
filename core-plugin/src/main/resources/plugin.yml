@@ -1,5 +1,10 @@
 name: '${pluginName}'
 version: '${version}'
-main: org.yuemi.Main
+main: org.yuemi.mmomobs.plugin.MmoMobsPlugin
 authors: [${authors}]
 api-version: '${apiVersion}'
+
+softdepend: [
+  YueMiLibs,
+  PlaceholderAPI
+]
