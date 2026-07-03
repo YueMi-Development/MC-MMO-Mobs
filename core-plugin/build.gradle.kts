@@ -45,7 +45,7 @@ tasks.jar {
             "Implementation-Title" to pluginName,
             "Implementation-Version" to pluginVersion,
             "Implementation-Vendor" to developerName,
-            "License" to "MIT"
+            "License" to "GPL-3.0"
         )
     }
 }
