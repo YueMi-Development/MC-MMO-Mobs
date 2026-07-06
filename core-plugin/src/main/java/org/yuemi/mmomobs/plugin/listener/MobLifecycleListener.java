@@ -19,10 +19,15 @@ import org.yuemi.mmomechanics.api.MmoMechanicsApi;
 import org.yuemi.mmomobs.plugin.mob.MobManager;
 import org.yuemi.mmomobs.plugin.mob.MobSkillConfig;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 public final class MobLifecycleListener {
 
     private final JavaPlugin plugin;
     private final MobManager mobManager;
+    private final Set<UUID> activeCasters = new HashSet<>();
 
     public MobLifecycleListener(@NotNull JavaPlugin plugin, @NotNull MobManager mobManager) {
         this.plugin = plugin;
@@ -108,16 +113,26 @@ public final class MobLifecycleListener {
     }
 
     private void triggerSkills(@NotNull Entity entity, @NotNull String triggerType) {
-        mobManager.getActiveMob(entity).ifPresent(activeMob -> {
-            MmoMechanicsApi mechanicsApi = Bukkit.getServicesManager().load(MmoMechanicsApi.class);
-            if (mechanicsApi == null) {
-                return;
-            }
-            for (MobSkillConfig skillConfig : activeMob.getSkills()) {
-                if (skillConfig.trigger() != null && skillConfig.trigger().equalsIgnoreCase(triggerType)) {
-                    mechanicsApi.castSkill(activeMob.getUniqueId(), skillConfig.skill());
+        UUID uuid = entity.getUniqueId();
+        if (activeCasters.contains(uuid)) {
+            return; // Prevent infinite event loops from self-inflicted skill damage
+        }
+
+        activeCasters.add(uuid);
+        try {
+            mobManager.getActiveMob(entity).ifPresent(activeMob -> {
+                MmoMechanicsApi mechanicsApi = Bukkit.getServicesManager().load(MmoMechanicsApi.class);
+                if (mechanicsApi == null) {
+                    return;
                 }
-            }
-        });
+                for (MobSkillConfig skillConfig : activeMob.getSkills()) {
+                    if (skillConfig.trigger() != null && skillConfig.trigger().equalsIgnoreCase(triggerType)) {
+                        mechanicsApi.castSkill(activeMob.getUniqueId(), skillConfig.skill());
+                    }
+                }
+            });
+        } finally {
+            activeCasters.remove(uuid);
+        }
     }
 }
