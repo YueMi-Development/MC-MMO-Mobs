@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"org.yuemi.mmomobs.api","l":"MmoMobsApi"},{"p":"org.yuemi.mmomobs.api","l":"MmoMobsApiProvider"}];updateSearchResults();
