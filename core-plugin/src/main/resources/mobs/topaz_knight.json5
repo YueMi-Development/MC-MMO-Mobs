@@ -1,0 +1,21 @@
+{
+  // Topaz knight — fast, armed, uses mixed vanilla + CraftEngine gear
+  name: "<yellow>Topaz Knight",
+  type: "SKELETON",
+  health: 120,
+  speed: 0.30,
+  tags: ["topaz", "knight"],
+  skills: [
+    {
+      skill: "lightning_radius_storm",
+      trigger: "onAttack"
+    }
+  ],
+  equipment: {
+    hand: "minecraft:iron_sword",
+    helmet: "craftengine:topaz_helmet",
+    chestplate: "craftengine:topaz_chestplate",
+    leggings: "craftengine:topaz_leggings",
+    boots: "craftengine:topaz_boots"
+  }
+}
