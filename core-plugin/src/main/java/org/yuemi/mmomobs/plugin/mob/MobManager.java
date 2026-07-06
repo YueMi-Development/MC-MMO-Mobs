@@ -164,8 +164,9 @@ public final class MobManager {
             }
         }
 
-        // Apply Universal Options
+        // Apply Universal & Specific Options
         MobOptionsApplier.applyUniversalOptions(entity, config.options());
+        MobOptionsApplier.applySpecificOptions(entity, config.options());
 
         // Register Mob & write PDC data
         registerMob(entity, cleanType, config);
@@ -225,9 +226,10 @@ public final class MobManager {
             }
         }
 
-        // Apply universal options when loading entity back into world
+        // Apply universal & specific options when loading entity back into world
         if (config != null) {
             MobOptionsApplier.applyUniversalOptions(entity, config.options());
+            MobOptionsApplier.applySpecificOptions(entity, config.options());
         }
 
         ActiveMob activeMob = new ActiveMob(entity, mobType, tags, skills, config != null ? config.options() : null);

@@ -108,7 +108,182 @@ public final class MobLifecycleListener {
                     if (event instanceof EntityDamageByEntityEvent) {
                         return;
                     }
-                    triggerSkills(event.getEntity(), "onDamaged");
+                    Entity entity = event.getEntity();
+                    triggerSkills(entity, "onDamaged");
+
+                    // DigOutOfGround option
+                    if (event.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+                        mobManager.getActiveMob(entity).ifPresent(activeMob -> {
+                            var options = activeMob.getOptions();
+                            if (options != null && options.digOutOfGround() != null && options.digOutOfGround()) {
+                                entity.teleport(entity.getLocation().add(0, 2, 0));
+                            }
+                        });
+                    }
+                });
+
+        // PreventTeleport option
+        eventApi.bukkit().subscribe(org.bukkit.event.entity.EntityTeleportEvent.class)
+                .priority(EventPriority.NORMAL)
+                .ignoreCancelled(true)
+                .handler(event -> {
+                    mobManager.getActiveMob(event.getEntity()).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null && options.preventTeleport() != null && options.preventTeleport()) {
+                            event.setCancelled(true);
+                        }
+                    });
+                });
+
+        // PreventSlimeSplit option
+        eventApi.bukkit().subscribe(org.bukkit.event.entity.SlimeSplitEvent.class)
+                .priority(EventPriority.NORMAL)
+                .ignoreCancelled(true)
+                .handler(event -> {
+                    mobManager.getActiveMob(event.getEntity()).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null && options.preventSlimeSplit() != null && options.preventSlimeSplit()) {
+                            event.setCancelled(true);
+                        }
+                    });
+                });
+
+        // PreventSunburn option
+        eventApi.bukkit().subscribe(org.bukkit.event.entity.EntityCombustEvent.class)
+                .priority(EventPriority.NORMAL)
+                .ignoreCancelled(true)
+                .handler(event -> {
+                    if (event instanceof org.bukkit.event.entity.EntityCombustByEntityEvent || event instanceof org.bukkit.event.entity.EntityCombustByBlockEvent) {
+                        return;
+                    }
+                    mobManager.getActiveMob(event.getEntity()).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null && options.preventSunburn() != null && options.preventSunburn()) {
+                            event.setCancelled(true);
+                        }
+                    });
+                });
+
+        // PreventTransformation option
+        eventApi.bukkit().subscribe(org.bukkit.event.entity.EntityTransformEvent.class)
+                .priority(EventPriority.NORMAL)
+                .ignoreCancelled(true)
+                .handler(event -> {
+                    mobManager.getActiveMob(event.getEntity()).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null && options.preventTransformation() != null && options.preventTransformation()) {
+                            event.setCancelled(true);
+                        }
+                    });
+                });
+
+        // PreventLeashing option
+        eventApi.bukkit().subscribe(org.bukkit.event.entity.PlayerLeashEntityEvent.class)
+                .priority(EventPriority.NORMAL)
+                .ignoreCancelled(true)
+                .handler(event -> {
+                    mobManager.getActiveMob(event.getEntity()).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null && options.preventLeashing() != null && options.preventLeashing()) {
+                            event.setCancelled(true);
+                        }
+                    });
+                });
+
+        // PreventRenaming & Interactable options
+        eventApi.bukkit().subscribe(org.bukkit.event.player.PlayerInteractEntityEvent.class)
+                .priority(EventPriority.NORMAL)
+                .ignoreCancelled(true)
+                .handler(event -> {
+                    mobManager.getActiveMob(event.getRightClicked()).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null) {
+                            if (options.interactable() != null && !options.interactable()) {
+                                event.setCancelled(true);
+                                return;
+                            }
+                            if (options.preventRenaming() != null && options.preventRenaming()) {
+                                org.bukkit.inventory.ItemStack item = event.getPlayer().getInventory().getItem(event.getHand());
+                                if (item != null && item.getType() == org.bukkit.Material.NAME_TAG) {
+                                    event.setCancelled(true);
+                                }
+                            }
+                        }
+                    });
+                });
+
+        eventApi.bukkit().subscribe(org.bukkit.event.player.PlayerInteractAtEntityEvent.class)
+                .priority(EventPriority.NORMAL)
+                .ignoreCancelled(true)
+                .handler(event -> {
+                    mobManager.getActiveMob(event.getRightClicked()).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null && options.interactable() != null && !options.interactable()) {
+                            event.setCancelled(true);
+                        }
+                    });
+                });
+
+        // MaxCombatDistance & PreventVanillaDamage options
+        eventApi.bukkit().subscribe(EntityDamageByEntityEvent.class)
+                .priority(EventPriority.NORMAL)
+                .ignoreCancelled(true)
+                .handler(event -> {
+                    Entity victim = event.getEntity();
+                    Entity damager = event.getDamager();
+                    if (damager instanceof Projectile proj && proj.getShooter() instanceof Entity shooter) {
+                        damager = shooter;
+                    }
+
+                    // MaxCombatDistance check (player damaging custom mob)
+                    if (damager instanceof org.bukkit.entity.Player player) {
+                        mobManager.getActiveMob(victim).ifPresent(activeMob -> {
+                            var options = activeMob.getOptions();
+                            if (options != null && options.maxCombatDistance() != null) {
+                                double dist = player.getLocation().distance(victim.getLocation());
+                                if (dist > options.maxCombatDistance()) {
+                                    event.setCancelled(true);
+                                }
+                            }
+                        });
+                    }
+
+                    // PreventVanillaDamage check (custom mob damaging victim)
+                    mobManager.getActiveMob(damager).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null && options.preventVanillaDamage() != null && options.preventVanillaDamage()) {
+                            event.setCancelled(true);
+                        }
+                    });
+                });
+
+        // PreventOtherDrops & PreventMobKillDrops options
+        eventApi.bukkit().subscribe(EntityDeathEvent.class)
+                .priority(EventPriority.NORMAL)
+                .handler(event -> {
+                    Entity victim = event.getEntity();
+
+                    // PreventOtherDrops (custom mob dies)
+                    mobManager.getActiveMob(victim).ifPresent(activeMob -> {
+                        var options = activeMob.getOptions();
+                        if (options != null && options.preventOtherDrops() != null && options.preventOtherDrops()) {
+                            event.getDrops().clear();
+                        }
+                    });
+
+                    // PreventMobKillDrops (victim killed by custom mob)
+                    if (victim.getLastDamageCause() instanceof EntityDamageByEntityEvent damageEvent) {
+                        Entity killer = damageEvent.getDamager();
+                        if (killer instanceof Projectile proj && proj.getShooter() instanceof Entity shooter) {
+                            killer = shooter;
+                        }
+                        mobManager.getActiveMob(killer).ifPresent(activeMob -> {
+                            var options = activeMob.getOptions();
+                            if (options != null && options.preventMobKillDrops() != null && options.preventMobKillDrops()) {
+                                event.getDrops().clear();
+                            }
+                        });
+                    }
                 });
     }
 
