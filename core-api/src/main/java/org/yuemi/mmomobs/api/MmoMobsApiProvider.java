@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 public interface MmoMobsApiProvider {
 
     /**
+     * Retrieves the currently registered MmoMobsApi implementation.
+     *
      * @return active API instance
      */
     @NotNull

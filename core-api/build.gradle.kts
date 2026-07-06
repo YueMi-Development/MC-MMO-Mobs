@@ -52,6 +52,14 @@ tasks.named<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
 }
 
+tasks.javadoc {
+    title = "$pluginName ${project.version} API"
+    (options as StandardJavadocDocletOptions).apply {
+        windowTitle = "$pluginName ${project.version} API"
+        docTitle = "$pluginName ${project.version} API"
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
