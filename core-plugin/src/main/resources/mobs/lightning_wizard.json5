@@ -1,0 +1,13 @@
+{
+  // Example custom mob configuration
+  name: "<yellow>Lightning Wizard",
+  type: "SKELETON",
+  health: 100,
+  speed: 0.25,
+  skills: [
+    {
+      skill: "lightning_radius_storm",
+      trigger: "onAttack"
+    }
+  ]
+}
