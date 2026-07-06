@@ -9,5 +9,9 @@
       skill: "lightning_radius_storm",
       trigger: "onAttack"
     }
-  ]
+  ],
+  equipment: {
+    hand: "mmoitems:lightning_sword",
+    helmet: "minecraft:golden_helmet"
+  }
 }

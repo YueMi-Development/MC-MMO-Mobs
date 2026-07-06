@@ -8,5 +8,6 @@ public record MobConfigDto(
     Double health,
     Double speed,
     List<String> tags,
-    List<MobSkillConfig> skills
+    List<MobSkillConfig> skills,
+    EquipmentConfigDto equipment
 ) {}

@@ -14,5 +14,11 @@
       skill: "speed_shield",
       trigger: "onDamaged"
     }
-  ]
+  ],
+  equipment: {
+    hand: "mmoitems:fire_sword",
+    chestplate: "minecraft:iron_chestplate",
+    leggings: "minecraft:iron_leggings",
+    boots: "minecraft:iron_boots"
+  }
 }

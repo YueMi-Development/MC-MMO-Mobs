@@ -140,6 +140,25 @@ public final class MobManager {
                     speedAttr.setBaseValue(config.speed());
                 }
             }
+            if (config.equipment() != null) {
+                try {
+                    org.yuemi.libs.api.items.ItemsApi itemsApi = org.yuemi.libs.api.items.ItemsApiProvider.getApi();
+                    if (itemsApi != null) {
+                        var eq = config.equipment();
+                        var inv = living.getEquipment();
+                        if (inv != null) {
+                            if (eq.hand() != null) inv.setItemInMainHand(itemsApi.getItem(eq.hand(), 1));
+                            if (eq.offhand() != null) inv.setItemInOffHand(itemsApi.getItem(eq.offhand(), 1));
+                            if (eq.helmet() != null) inv.setHelmet(itemsApi.getItem(eq.helmet(), 1));
+                            if (eq.chestplate() != null) inv.setChestplate(itemsApi.getItem(eq.chestplate(), 1));
+                            if (eq.leggings() != null) inv.setLeggings(itemsApi.getItem(eq.leggings(), 1));
+                            if (eq.boots() != null) inv.setBoots(itemsApi.getItem(eq.boots(), 1));
+                        }
+                    }
+                } catch (Throwable t) {
+                    plugin.getLogger().warning("Could not apply equipment to custom mob: " + t.getMessage());
+                }
+            }
         }
 
         // Register Mob & write PDC data

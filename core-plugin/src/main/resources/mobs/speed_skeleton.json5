@@ -10,5 +10,10 @@
       skill: "speed_shield",
       trigger: "onDamaged"
     }
-  ]
+  ],
+  equipment: {
+    hand: "minecraft:bow",
+    chestplate: "minecraft:chainmail_chestplate",
+    boots: "mmoitems:speed_boots"
+  }
 }
