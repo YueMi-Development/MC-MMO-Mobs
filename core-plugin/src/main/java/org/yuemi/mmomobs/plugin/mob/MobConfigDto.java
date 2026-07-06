@@ -1,6 +1,7 @@
 package org.yuemi.mmomobs.plugin.mob;
 
 import java.util.List;
+import org.yuemi.mmomobs.plugin.mob.options.MobOptionsDto;
 
 public record MobConfigDto(
     String name,
@@ -9,5 +10,6 @@ public record MobConfigDto(
     Double speed,
     List<String> tags,
     List<MobSkillConfig> skills,
-    EquipmentConfigDto equipment
+    EquipmentConfigDto equipment,
+    MobOptionsDto options
 ) {}

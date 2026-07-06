@@ -15,6 +15,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.yuemi.mmomobs.plugin.mob.options.MobOptionsDto;
+import org.yuemi.mmomobs.plugin.mob.options.MobOptionsApplier;
 
 import java.io.File;
 import java.net.URI;
@@ -162,6 +164,9 @@ public final class MobManager {
             }
         }
 
+        // Apply Universal Options
+        MobOptionsApplier.applyUniversalOptions(entity, config.options());
+
         // Register Mob & write PDC data
         registerMob(entity, cleanType, config);
         return entity;
@@ -189,7 +194,7 @@ public final class MobManager {
             }
         }
 
-        ActiveMob activeMob = new ActiveMob(entity, mobType, tags, skills);
+        ActiveMob activeMob = new ActiveMob(entity, mobType, tags, skills, config.options());
         activeMobs.put(entity.getUniqueId(), activeMob);
     }
 
@@ -220,7 +225,12 @@ public final class MobManager {
             }
         }
 
-        ActiveMob activeMob = new ActiveMob(entity, mobType, tags, skills);
+        // Apply universal options when loading entity back into world
+        if (config != null) {
+            MobOptionsApplier.applyUniversalOptions(entity, config.options());
+        }
+
+        ActiveMob activeMob = new ActiveMob(entity, mobType, tags, skills, config != null ? config.options() : null);
         activeMobs.put(entity.getUniqueId(), activeMob);
     }
 
