@@ -5,7 +5,8 @@ authors: [${authors}]
 api-version: '${apiVersion}'
 
 depend: [
-  YueMiLibs
+  YueMiLibs,
+  MmoMechanics
 ]
 
 softdepend: [
