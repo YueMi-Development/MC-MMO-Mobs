@@ -2,6 +2,7 @@ name: '${pluginName}'
 version: '${version}'
 main: org.yuemi.mmomobs.plugin.MmoMobsPlugin
 authors: [${authors}]
+contributors: [${contributors}]
 api-version: '${apiVersion}'
 
 depend: [

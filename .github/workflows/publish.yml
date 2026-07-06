@@ -32,6 +32,26 @@ jobs:
       - name: Grant gradlew permission
         run: chmod +x gradlew
 
+      - name: Setup Git User
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+      - name: Set contributors list
+        run: |
+          CONTRIBUTORS=$(curl -s https://api.github.com/repos/${{ github.repository }}/contributors \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            | jq -r '.[].login' | paste -sd "," -)
+          if grep -q "^contributors=" gradle.properties; then
+            sed -i "s/^contributors=.*/contributors=$CONTRIBUTORS/" gradle.properties
+          else
+            echo "contributors=$CONTRIBUTORS" >> gradle.properties
+          fi
+          echo "Contributors: $CONTRIBUTORS"
+          git add gradle.properties
+          git commit -m "chore: update contributors list"
+          git push origin HEAD:${{ github.ref_name }}
+
       - name: Verify and Update Version
         run: |
           BRANCH_VERSION=$(echo "${{ github.ref_name }}" | sed 's/^v//')
@@ -41,8 +61,6 @@ jobs:
           if [ "$BRANCH_VERSION" != "$GRADLE_VERSION" ]; then
             echo "Versions differ. Updating gradle.properties..."
             sed -i "s/^version=.*/version=$BRANCH_VERSION/" gradle.properties
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
             git add gradle.properties
             git commit -m "chore: update version to $BRANCH_VERSION"
             git push origin HEAD:${{ github.ref_name }}

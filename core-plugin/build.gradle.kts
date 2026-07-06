@@ -9,6 +9,7 @@ val developerId: String by project
 val developerName: String by project
 val apiVersion: String by project
 val authors: String by project
+val contributors: String by project
 val paperApiVersion: String by project
 val yuemiLibsApiVersion: String by project
 val mmoMechanicsApiVersion: String by project
@@ -19,7 +20,8 @@ tasks.processResources {
         "pluginName" to pluginName,
         "version" to pluginVersion,
         "apiVersion" to apiVersion,
-        "authors" to authors
+        "authors" to authors,
+        "contributors" to contributors
     )
     inputs.properties(props)
     filteringCharset = "UTF-8"
