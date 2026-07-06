@@ -270,4 +270,9 @@ public final class MobManager {
     public Collection<ActiveMob> getActiveMobs() {
         return activeMobs.values();
     }
+
+    @NotNull
+    public Collection<String> getRegisteredMobTypes() {
+        return loadedConfigs.keySet();
+    }
 }

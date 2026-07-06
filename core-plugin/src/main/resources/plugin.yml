@@ -8,3 +8,9 @@ softdepend: [
   YueMiLibs,
   PlaceholderAPI
 ]
+
+commands:
+  mmomobs:
+    description: "Main command for MC-MMO-Mobs"
+    aliases: [mobs]
+    permission: mmomobs.admin
