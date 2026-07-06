@@ -84,31 +84,54 @@ public final class MobManager {
             mobsFolder.mkdirs();
         }
 
-        // Ensure at least the example mob config exists
-        File exampleFile = new File(mobsFolder, "lightning_wizard.json5");
-        if (!exampleFile.exists()) {
-            try {
-                plugin.saveResource("mobs/lightning_wizard.json5", false);
-            } catch (Exception e) {
-                try (java.io.FileWriter writer = new java.io.FileWriter(exampleFile)) {
-                    writer.write("{\n" +
-                            "  // Example custom mob configuration\n" +
-                            "  name: \"<yellow>Lightning Wizard\",\n" +
-                            "  type: \"SKELETON\",\n" +
-                            "  health: 100,\n" +
-                            "  speed: 0.25,\n" +
-                            "  skills: [\n" +
-                            "    {\n" +
-                            "      skill: \"lightning_radius_storm\",\n" +
-                            "      trigger: \"onAttack\"\n" +
-                            "    }\n" +
-                            "  ]\n" +
-                            "}\n");
-                } catch (java.io.IOException ex) {
-                    plugin.getLogger().severe("Could not create default example mob file: " + ex.getMessage());
-                }
-            }
-        }
+        // Ensure at least the example mob configs exist
+        ensureDefaultMobConfig("lightning_wizard.json5", "{\n" +
+                "  // Example custom mob configuration\n" +
+                "  name: \"<yellow>Lightning Wizard\",\n" +
+                "  type: \"SKELETON\",\n" +
+                "  health: 100,\n" +
+                "  speed: 0.25,\n" +
+                "  skills: [\n" +
+                "    {\n" +
+                "      skill: \"lightning_radius_storm\",\n" +
+                "      trigger: \"onAttack\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n");
+
+        ensureDefaultMobConfig("fire_zombie.json5", "{\n" +
+                "  // Custom Fire Zombie mob configuration\n" +
+                "  name: \"<red>Fire Zombie\",\n" +
+                "  type: \"ZOMBIE\",\n" +
+                "  health: 60,\n" +
+                "  speed: 0.23,\n" +
+                "  tags: [\"fire\", \"elite\"],\n" +
+                "  skills: [\n" +
+                "    {\n" +
+                "      skill: \"fire_breath\",\n" +
+                "      trigger: \"onAttack\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      skill: \"speed_shield\",\n" +
+                "      trigger: \"onDamaged\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n");
+
+        ensureDefaultMobConfig("speed_skeleton.json5", "{\n" +
+                "  // Custom Speed Skeleton mob configuration\n" +
+                "  name: \"<aqua>Speed Skeleton\",\n" +
+                "  type: \"SKELETON\",\n" +
+                "  health: 40,\n" +
+                "  speed: 0.28,\n" +
+                "  tags: [\"speedy\", \"ranged\"],\n" +
+                "  skills: [\n" +
+                "    {\n" +
+                "      skill: \"speed_shield\",\n" +
+                "      trigger: \"onDamaged\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n");
 
         File[] files = mobsFolder.listFiles();
         if (files != null) {
@@ -274,5 +297,21 @@ public final class MobManager {
     @NotNull
     public Collection<String> getRegisteredMobTypes() {
         return loadedConfigs.keySet();
+    }
+
+    private void ensureDefaultMobConfig(@NotNull String fileName, @NotNull String defaultJson) {
+        File mobsFolder = new File(plugin.getDataFolder(), "mobs");
+        File file = new File(mobsFolder, fileName);
+        if (!file.exists()) {
+            try {
+                plugin.saveResource("mobs/" + fileName, false);
+            } catch (Exception e) {
+                try (java.io.FileWriter writer = new java.io.FileWriter(file)) {
+                    writer.write(defaultJson);
+                } catch (java.io.IOException ex) {
+                    plugin.getLogger().severe("Could not create default config file: " + fileName + " - " + ex.getMessage());
+                }
+            }
+        }
     }
 }

@@ -1,0 +1,18 @@
+{
+  // Custom Fire Zombie mob configuration
+  name: "<red>Fire Zombie",
+  type: "ZOMBIE",
+  health: 60,
+  speed: 0.23,
+  tags: ["fire", "elite"],
+  skills: [
+    {
+      skill: "fire_breath",
+      trigger: "onAttack"
+    },
+    {
+      skill: "speed_shield",
+      trigger: "onDamaged"
+    }
+  ]
+}

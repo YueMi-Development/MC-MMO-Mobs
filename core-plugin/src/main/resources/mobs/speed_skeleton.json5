@@ -1,0 +1,14 @@
+{
+  // Custom Speed Skeleton mob configuration
+  name: "<aqua>Speed Skeleton",
+  type: "SKELETON",
+  health: 40,
+  speed: 0.28,
+  tags: ["speedy", "ranged"],
+  skills: [
+    {
+      skill: "speed_shield",
+      trigger: "onDamaged"
+    }
+  ]
+}
