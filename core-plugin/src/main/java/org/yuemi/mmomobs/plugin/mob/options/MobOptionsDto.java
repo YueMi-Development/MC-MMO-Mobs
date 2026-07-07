@@ -131,5 +131,7 @@ public record MobOptionsDto(
     @JsonProperty("HasTrades") Boolean hasTrades,
     @JsonProperty("Profession") String profession,
     @JsonProperty("Level") Integer level,
-    @JsonProperty("ZombieVillagerProfession") String zombieVillagerProfession
+    @JsonProperty("ZombieVillagerProfession") String zombieVillagerProfession,
+    @JsonProperty("AIGoalSelectors") java.util.List<String> aiGoalSelectors,
+    @JsonProperty("AITargetSelectors") java.util.List<String> aiTargetSelectors
 ) {}

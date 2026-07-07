@@ -115,6 +115,11 @@ public final class MobOptionsApplier {
             if (options.preventItemPickup() != null) {
                 living.setCanPickupItems(!options.preventItemPickup());
             }
+
+            // AI Goal Selectors
+            if (living instanceof Mob mob) {
+                GoalSelectorManager.applyGoalSelectors(mob, options.aiGoalSelectors());
+            }
         }
     }
 
