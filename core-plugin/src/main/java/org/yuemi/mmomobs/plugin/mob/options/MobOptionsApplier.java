@@ -119,6 +119,7 @@ public final class MobOptionsApplier {
             // AI Goal Selectors
             if (living instanceof Mob mob) {
                 GoalSelectorManager.applyGoalSelectors(mob, options.aiGoalSelectors());
+                GoalSelectorManager.applyTargetSelectors(mob, options.aiTargetSelectors());
             }
         }
     }

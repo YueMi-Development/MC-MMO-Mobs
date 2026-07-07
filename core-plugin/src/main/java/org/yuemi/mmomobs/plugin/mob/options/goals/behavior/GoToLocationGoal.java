@@ -1,4 +1,4 @@
-package org.yuemi.mmomobs.plugin.mob.options.goals;
+package org.yuemi.mmomobs.plugin.mob.options.goals.behavior;
 
 import com.destroystokyo.paper.entity.ai.Goal;
 import com.destroystokyo.paper.entity.ai.GoalKey;

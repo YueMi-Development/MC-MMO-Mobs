@@ -8,12 +8,15 @@ import org.bukkit.Location;
 import org.bukkit.entity.Mob;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.yuemi.mmomobs.plugin.mob.options.goals.behavior.*;
+import org.yuemi.mmomobs.plugin.mob.options.goals.target.*;
 
 import java.util.*;
 
 public final class GoalSelectorManager {
 
     private static final Map<String, GoalKey<Mob>> VANILLA_GOALS = new HashMap<>();
+    private static final Map<String, GoalKey<Mob>> VANILLA_TARGETS = new HashMap<>();
 
     static {
         registerVanilla("float", "FLOAT");
@@ -40,6 +43,19 @@ public final class GoalSelectorManager {
         registerVanilla("bowshoot", "SKELETON_BOW_ATTACK");
         registerVanilla("bowmaster", "SKELETON_BOW_ATTACK");
         registerVanilla("crossbowattack", "PIGLIN_CROSSBOW_ATTACK");
+
+        registerVanillaTarget("hurtbytarget", "HURT_BY");
+        registerVanillaTarget("attacker", "HURT_BY");
+        registerVanillaTarget("damager", "HURT_BY");
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void registerVanillaTarget(String alias, String fieldName) {
+        try {
+            java.lang.reflect.Field field = VanillaGoal.class.getField(fieldName);
+            GoalKey<Mob> key = (GoalKey<Mob>) field.get(null);
+            VANILLA_TARGETS.put(alias.toLowerCase(), key);
+        } catch (Throwable ignored) {}
     }
 
     @SuppressWarnings("unchecked")
@@ -148,7 +164,7 @@ public final class GoalSelectorManager {
                         double z = Double.parseDouble(parts[2].trim());
                         double speed = parts.length >= 4 ? Double.parseDouble(parts[3].trim()) : 1.0D;
                         Location loc = new Location(world, x, y, z);
-                        mobGoals.addGoal(mob, priority, new org.yuemi.mmomobs.plugin.mob.options.goals.GoToLocationGoal(mob, loc, speed));
+                        mobGoals.addGoal(mob, priority, new GoToLocationGoal(mob, loc, speed));
                     }
                 } else if (name.equals("gotoowner")) {
                     double dist = 5.0D;
@@ -158,7 +174,7 @@ public final class GoalSelectorManager {
                         dist = Double.parseDouble(parts[0].trim());
                         if (parts.length >= 2) speed = Double.parseDouble(parts[1].trim());
                     }
-                    mobGoals.addGoal(mob, priority, new org.yuemi.mmomobs.plugin.mob.options.goals.GoToOwnerGoal(mob, dist, speed));
+                    mobGoals.addGoal(mob, priority, new GoToOwnerGoal(mob, dist, speed));
                 } else if (name.equals("patrol") || name.equals("patrolroute")) {
                     List<Location> points = new ArrayList<>();
                     String[] coordinateSets = args.split(";");
@@ -173,7 +189,7 @@ public final class GoalSelectorManager {
                         }
                     }
                     if (!points.isEmpty()) {
-                        mobGoals.addGoal(mob, priority, new org.yuemi.mmomobs.plugin.mob.options.goals.PatrolGoal(mob, points, speed));
+                        mobGoals.addGoal(mob, priority, new PatrolGoal(mob, points, speed));
                     }
                 } else if (name.equals("fleeplayers") || name.equals("runfromplayers")) {
                     double radius = 10.0D;
@@ -183,9 +199,128 @@ public final class GoalSelectorManager {
                         radius = Double.parseDouble(parts[0].trim());
                         if (parts.length >= 2) speed = Double.parseDouble(parts[1].trim());
                     }
-                    mobGoals.addGoal(mob, priority, new org.yuemi.mmomobs.plugin.mob.options.goals.FleePlayersGoal(mob, radius, speed));
+                    mobGoals.addGoal(mob, priority, new FleePlayersGoal(mob, radius, speed));
                 } else if (name.equals("donothing")) {
-                    mobGoals.addGoal(mob, priority, new org.yuemi.mmomobs.plugin.mob.options.goals.DoNothingGoal(mob));
+                    mobGoals.addGoal(mob, priority, new DoNothingGoal(mob));
+                }
+            } catch (Throwable ignored) {}
+        }
+    }
+
+    public static void applyTargetSelectors(@NotNull Mob mob, @Nullable List<String> selectors) {
+        if (selectors == null || selectors.isEmpty()) {
+            return;
+        }
+
+        boolean clearAll = false;
+        for (String sel : selectors) {
+            String clean = sel.trim().toLowerCase();
+            if (clean.endsWith("clear") || clean.endsWith("reset")) {
+                clearAll = true;
+                break;
+            }
+        }
+
+        if (clearAll) {
+            Collection<Goal<Mob>> currentGoals = Bukkit.getMobGoals().getAllGoals(mob);
+            for (Goal<Mob> goal : new ArrayList<>(currentGoals)) {
+                if (goal.getTypes().contains(com.destroystokyo.paper.entity.ai.GoalType.TARGET)) {
+                    Bukkit.getMobGoals().removeGoal(mob, goal);
+                }
+            }
+        }
+
+        Set<GoalKey<Mob>> targetsToKeep = new HashSet<>();
+        List<ParsedGoal> customTargets = new ArrayList<>();
+
+        for (String sel : selectors) {
+            String content = sel.trim();
+            int priority = 3; // Default priority
+            
+            int spaceIdx = content.indexOf(' ');
+            if (spaceIdx != -1) {
+                String firstWord = content.substring(0, spaceIdx);
+                try {
+                    priority = Integer.parseInt(firstWord);
+                    content = content.substring(spaceIdx + 1).trim();
+                } catch (NumberFormatException ignored) {}
+            }
+
+            String lowerContent = content.toLowerCase();
+            if (lowerContent.equals("clear") || lowerContent.equals("reset")) {
+                continue;
+            }
+
+            int argsIdx = lowerContent.indexOf(' ');
+            String baseAlias = argsIdx != -1 ? lowerContent.substring(0, argsIdx) : lowerContent;
+            String arguments = argsIdx != -1 ? content.substring(argsIdx + 1).trim() : "";
+
+            GoalKey<Mob> key = VANILLA_TARGETS.get(baseAlias);
+            if (key != null) {
+                targetsToKeep.add(key);
+            } else {
+                customTargets.add(new ParsedGoal(priority, baseAlias, arguments));
+            }
+        }
+
+        if (!clearAll) {
+            Collection<Goal<Mob>> currentGoals = Bukkit.getMobGoals().getAllGoals(mob);
+            for (Goal<Mob> goal : new ArrayList<>(currentGoals)) {
+                if (goal.getTypes().contains(com.destroystokyo.paper.entity.ai.GoalType.TARGET)) {
+                    GoalKey<Mob> key = goal.getKey();
+                    if (!targetsToKeep.contains(key)) {
+                        Bukkit.getMobGoals().removeGoal(mob, goal);
+                    }
+                }
+            }
+        }
+
+        applyCustomTargets(mob, customTargets);
+    }
+
+    private static void applyCustomTargets(Mob mob, List<ParsedGoal> customTargets) {
+        if (customTargets.isEmpty()) return;
+
+        var mobGoals = Bukkit.getMobGoals();
+
+        for (ParsedGoal custom : customTargets) {
+            String name = custom.name().toLowerCase();
+            String args = custom.args().trim();
+            int priority = custom.priority();
+
+            try {
+                if (name.equals("players") || name.equals("player")) {
+                    double radius = 16.0D;
+                    if (!args.isEmpty()) {
+                        radius = Double.parseDouble(args);
+                    }
+                    mobGoals.addGoal(mob, priority, new NearestTargetGoal(mob, "players", org.bukkit.entity.Player.class, radius, null));
+                } else if (name.equals("villagers") || name.equals("villager")) {
+                    double radius = 16.0D;
+                    if (!args.isEmpty()) {
+                        radius = Double.parseDouble(args);
+                    }
+                    mobGoals.addGoal(mob, priority, new NearestTargetGoal(mob, "villagers", org.bukkit.entity.Villager.class, radius, null));
+                } else if (name.equals("irongolem") || name.equals("iron_golems") || name.equals("iron_golem")) {
+                    double radius = 16.0D;
+                    if (!args.isEmpty()) {
+                        radius = Double.parseDouble(args);
+                    }
+                    mobGoals.addGoal(mob, priority, new NearestTargetGoal(mob, "irongolem", org.bukkit.entity.IronGolem.class, radius, null));
+                } else if (name.equals("monsters") || name.equals("monster")) {
+                    double radius = 16.0D;
+                    if (!args.isEmpty()) {
+                        radius = Double.parseDouble(args);
+                    }
+                    mobGoals.addGoal(mob, priority, new NearestTargetGoal(mob, "monsters", org.bukkit.entity.LivingEntity.class, radius, le -> le instanceof org.bukkit.entity.Enemy));
+                } else if (name.equals("ownerattacker") || name.equals("ownerhurtby") || name.equals("ownerhurtbytarget") || name.equals("ownerdamager")) {
+                    mobGoals.addGoal(mob, priority, new OwnerAttackerGoal(mob));
+                } else if (name.equals("ownertarget") || name.equals("ownerattack") || name.equals("ownerhurt")) {
+                    mobGoals.addGoal(mob, priority, new OwnerTargetGoal(mob));
+                } else if (name.equals("parenthurtby") || name.equals("parenthurtbytarget") || name.equals("parentdamager") || name.equals("parentattacker")) {
+                    mobGoals.addGoal(mob, priority, new ParentAttackerGoal(mob));
+                } else if (name.equals("parenttarget") || name.equals("parenthurt") || name.equals("parentattack")) {
+                    mobGoals.addGoal(mob, priority, new ParentTargetGoal(mob));
                 }
             } catch (Throwable ignored) {}
         }
