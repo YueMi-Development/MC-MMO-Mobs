@@ -1,0 +1,16 @@
+{
+  // Verification example of a patrolling custom guard mob
+  name: "<gold>Patrol Guard",
+  type: "ZOMBIE",
+  health: 40,
+  options: {
+    AlwaysShowName: true,
+    PreventSunburn: true,
+    AIGoalSelectors: [
+      "0 clear",
+      "1 patrol 10,64,10;20,64,20;30,64,10",
+      "2 lookatplayers",
+      "3 float"
+    ]
+  }
+}
