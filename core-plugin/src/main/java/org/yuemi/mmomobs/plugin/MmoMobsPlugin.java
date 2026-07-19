@@ -1,6 +1,5 @@
 package org.yuemi.mmomobs.plugin;
 
-import org.yuemi.mmomobs.plugin.config.migration.ConfigMigrator;
 import org.yuemi.mmomobs.plugin.listener.MobLifecycleListener;
 import org.yuemi.mmomobs.plugin.mob.MobManager;
 import org.yuemi.mmomobs.plugin.command.MmoMobsCommand;
@@ -21,8 +20,8 @@ public final class MmoMobsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        migrateConfig();
+        new org.yuemi.config.api.ConfigManager(this, "org.yuemi.mmomobs.plugin.config.migration").loadAndMigrate(this);
+        reloadConfig();
 
         this.mobManager = new MobManager(this);
         this.mobManager.loadConfigs();
@@ -53,15 +52,6 @@ public final class MmoMobsPlugin extends JavaPlugin {
     public void onDisable() {
         if (api != null) {
             getServer().getServicesManager().unregister(MmoMobsApi.class, api);
-        }
-    }
-
-    private void migrateConfig() {
-        File configFile = new File(getDataFolder(), "config.yml");
-        if (configFile.exists()) {
-            ConfigMigrator migrator = new ConfigMigrator(this);
-            migrator.migrate(configFile);
-            reloadConfig();
         }
     }
 }
