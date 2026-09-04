@@ -3,11 +3,6 @@ package org.yuemi.mmomobs.plugin;
 import org.yuemi.mmomobs.plugin.listener.MobLifecycleListener;
 import org.yuemi.mmomobs.plugin.mob.MobManager;
 import org.yuemi.mmomobs.plugin.command.MmoMobsCommand;
-import org.yuemi.mmomobs.plugin.command.subcommands.SpawnCommand;
-import org.yuemi.mmomobs.plugin.command.subcommands.KillAllCommand;
-import org.yuemi.mmomobs.plugin.command.subcommands.ReloadCommand;
-
-import java.io.File;
 
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,10 +23,7 @@ public final class MmoMobsPlugin extends JavaPlugin {
 
         new MobLifecycleListener(this, mobManager).register();
 
-        MmoMobsCommand cmd = new MmoMobsCommand();
-        cmd.registerSubCommand(new SpawnCommand(mobManager));
-        cmd.registerSubCommand(new KillAllCommand(mobManager));
-        cmd.registerSubCommand(new ReloadCommand(mobManager));
+        MmoMobsCommand cmd = new MmoMobsCommand(mobManager);
         var mmoCommand = getCommand("mmomobs");
         if (mmoCommand != null) {
             mmoCommand.setExecutor(cmd);
