@@ -2,7 +2,9 @@ package org.yuemi.mmomobs.plugin.command.subcommands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.yuemi.libs.api.folia.FoliaSchedulers;
 import org.yuemi.mmomobs.plugin.command.BaseSubCommand;
 import org.yuemi.mmomobs.plugin.mob.ActiveMob;
 import org.yuemi.mmomobs.plugin.mob.MobManager;
@@ -36,12 +38,15 @@ public final class KillAllCommand extends BaseSubCommand {
     @Override
     public void execute(@NotNull CommandSender sender, @NotNull String[] args) {
         List<ActiveMob> mobs = new ArrayList<>(mobManager.getActiveMobs());
+        JavaPlugin plugin = JavaPlugin.getProvidingPlugin(getClass());
         int count = 0;
 
         for (ActiveMob mob : mobs) {
             Entity entity = mob.getEntity();
             if (entity.isValid()) {
-                entity.remove();
+                // Mobs may live in any region, so removal has to run on the region
+                // owning each entity rather than on the sender's thread.
+                FoliaSchedulers.executeEntity(plugin, entity, entity::remove);
                 count++;
             }
             mobManager.unregisterMob(mob.getUniqueId());

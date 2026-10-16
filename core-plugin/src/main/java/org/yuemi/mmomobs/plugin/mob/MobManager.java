@@ -105,6 +105,15 @@ public final class MobManager {
         }
     }
 
+    /**
+     * Spawns a custom mob at the given location.
+     *
+     * <p>Returns the spawned entity synchronously, so the caller must already be on the
+     * thread owning {@code location}'s region. Player commands satisfy this (a command
+     * runs on the sender's region thread, and they spawn at their own location). Callers
+     * running off-region must dispatch to
+     * {@code FoliaSchedulers.executeRegion(plugin, location, ...)} first.
+     */
     @NotNull
     public Entity spawnCustomMob(@NotNull String mobType, @NotNull Location location) {
         String cleanType = mobType.toLowerCase();
