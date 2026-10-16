@@ -4,6 +4,7 @@ main: org.yuemi.mmomobs.plugin.MmoMobsPlugin
 authors: [${authors}]
 contributors: [${contributors}]
 api-version: '${apiVersion}'
+folia-supported: true
 
 depend: [
   YueMiLibs,
